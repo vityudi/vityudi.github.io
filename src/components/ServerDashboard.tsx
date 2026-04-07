@@ -1,10 +1,9 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
 import { Play, GitBranch, ChevronLeft, ChevronRight } from "lucide-react";
 
 const GAP = 24;
-const VISIBLE = 2;
 
 const projects = [
   {
@@ -86,14 +85,22 @@ function ProjectCard({ proj }: { proj: typeof projects[number] }) {
 
 export function ServerDashboard() {
   const [current, setCurrent] = useState(0);
+  const [visible, setVisible] = useState(2);
   const containerRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
 
-  const maxIndex = projects.length - VISIBLE;
+  useEffect(() => {
+    const update = () => setVisible(window.innerWidth < 768 ? 1 : 2);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const maxIndex = projects.length - visible;
 
   const getStep = (): number => {
     if (!containerRef.current) return 300;
-    return (containerRef.current.offsetWidth - GAP * (VISIBLE - 1)) / VISIBLE + GAP;
+    return (containerRef.current.offsetWidth - GAP * (visible - 1)) / visible + GAP;
   };
 
   const snapTo = (index: number) => {
@@ -107,13 +114,18 @@ export function ServerDashboard() {
     });
   };
 
+  useEffect(() => {
+    snapTo(Math.min(current, maxIndex));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+
   const handleDragEnd = (_: unknown, info: { offset: { x: number } }) => {
     if (info.offset.x < -40) snapTo(current + 1);
     else if (info.offset.x > 40) snapTo(current - 1);
     else snapTo(current);
   };
 
-  const cardWidth = `calc((100% - ${GAP}px) / ${VISIBLE})`;
+  const cardWidth = visible === 1 ? "100%" : `calc((100% - ${GAP}px) / 2)`;
 
   return (
     <div className="flex flex-col gap-6">
