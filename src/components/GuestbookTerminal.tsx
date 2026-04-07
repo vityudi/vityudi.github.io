@@ -13,8 +13,13 @@ export function GuestbookTerminal() {
   const [command, setCommand] = useState("");
   const [logs, setLogs] = useState(mockLogs);
   const endRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
 

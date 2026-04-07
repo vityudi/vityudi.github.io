@@ -13,9 +13,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vitor Yudi - Fullstack & Cloud",
+  title: "Vitor Yudi - Fullstack & DevOps",
   description: "DevOps, Cloud Engineer and Fullstack Developer Portfolio",
 };
+
+import { ScrollProgress } from "@/components/ScrollProgress";
+
+import { MouseGridBackground } from "@/components/MouseGridBackground";
 
 export default function RootLayout({
   children,
@@ -24,7 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${outfit.variable} ${jetbrainsMono.variable} antialiased min-h-screen text-foreground font-sans`}>
+      <body className={`${outfit.variable} ${jetbrainsMono.variable} antialiased min-h-screen text-foreground font-sans relative`}>
+        <MouseGridBackground />
+        <ScrollProgress />
         {children}
       </body>
     </html>
