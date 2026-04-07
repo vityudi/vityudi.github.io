@@ -91,7 +91,8 @@ export function TerminalHero() {
                 <div className="pl-4 border-l-2 border-white/10 text-gray-400 font-sans text-base leading-relaxed">
                   <span className="text-term-keyword">#</span> Missão<br />
                   Construir infraestruturas escaláveis e aplicações resilientes.<br />
-                  Automatizar entregas de valor e unir o desenvolvimento de software robusto com a cultura DevOps.
+                  Unir o desenvolvimento de <b>software robusto</b> com <b>visão de produto</b>,
+                  entregando cadeia end-to-end completa com produtos que fazem sentido.
                 </div>
 
                 <div className="flex items-center gap-2 mt-6">

@@ -19,7 +19,7 @@ export function MouseGridBackground() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none bg-black">
+    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
       {/* Dynamic light following mouse — updated via DOM ref, no re-renders */}
       <div
         ref={lightRef}
@@ -28,7 +28,7 @@ export function MouseGridBackground() {
 
       {/* Grid Pattern with parallax */}
       <motion.div
-        className="absolute inset-[-100%] w-[300%] h-[300%] z-[-2] opacity-20"
+        className="absolute inset-[-100%] w-[300%] h-[300%] z-[-2] opacity-40"
         style={{
           y,
           backgroundImage: `
@@ -40,7 +40,7 @@ export function MouseGridBackground() {
       />
 
       {/* Vignette for depth */}
-      <div className="absolute inset-0 bg-black/60 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black_80%)]" />
+      <div className="absolute inset-0 bg-black/10 [mask-image:radial-gradient(ellipse_at_center,transparent_40%,black_95%)]" />
     </div>
   );
 }

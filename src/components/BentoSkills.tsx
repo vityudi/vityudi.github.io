@@ -69,7 +69,7 @@ export function BentoSkills() {
     >
       {/* Cloud Card (Large) */}
       <motion.div variants={item} className="col-span-2 row-span-2">
-        <TiltCard maxTilt={5} className="h-full rounded-xl p-6 border border-glass-border bg-gradient-to-br from-panel to-black/80 backdrop-blur-xl relative overflow-hidden group">
+        <TiltCard maxTilt={5} className="h-full rounded-xl p-6 border border-glass-border bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <Cloud size={120} />
           </div>
