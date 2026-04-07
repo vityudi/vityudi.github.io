@@ -31,7 +31,7 @@ export default function RootLayout({
       <body className={`${outfit.variable} ${jetbrainsMono.variable} antialiased min-h-screen text-foreground font-sans relative`}>
         <MouseGridBackground />
         <ScrollProgress />
-        <div className="relative z-[1]">
+        <div className="relative z-1">
           {children}
         </div>
       </body>

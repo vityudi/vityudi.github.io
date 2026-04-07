@@ -56,7 +56,7 @@ export function BentoSkills() {
 
   const item = {
     hidden: { opacity: 0, y: 25, filter: "blur(4px)" },
-    show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
+    show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } },
   };
 
   return (
@@ -69,7 +69,7 @@ export function BentoSkills() {
     >
       {/* Cloud Card (Large) */}
       <motion.div variants={item} className="col-span-2 row-span-2">
-        <TiltCard maxTilt={5} className="h-full rounded-xl p-6 border border-glass-border bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl relative overflow-hidden group">
+        <TiltCard maxTilt={5} className="h-full rounded-xl p-6 border border-glass-border bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <Cloud size={120} />
           </div>

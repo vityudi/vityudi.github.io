@@ -77,7 +77,7 @@ export function TerminalHero() {
                   <h1 className="text-4xl md:text-5xl font-sans font-extrabold mb-2 text-white">
                     Olá, eu sou <span className="text-neon-cyan drop-shadow-[0_0_15px_rgba(0,240,255,0.4)]">Vitor Yudi</span>
                   </h1>
-                  <h2 className="text-xl md:text-2xl text-foreground font-sans font-medium text-gray-300 drop-shadow-md">
+                  <h2 className="text-xl md:text-2xl text-foreground font-sans font-medium drop-shadow-md">
                     Desenvolvedor Fullstack & DevOps
                   </h2>
                 </div>
