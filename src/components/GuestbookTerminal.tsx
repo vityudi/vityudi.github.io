@@ -9,7 +9,7 @@ export function GuestbookTerminal() {
   const [logs, setLogs] = useState<GuestbookEntry[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
-  const isFirstRender = useRef(true);
+  const prevLogsLength = useRef(0);
 
   // Initial fetch
   useEffect(() => {
@@ -42,13 +42,12 @@ export function GuestbookTerminal() {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // Scroll to bottom on new entries (skip first render)
+  // Scroll to bottom only when a new entry is added after initial load
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
+    if (logs.length > prevLogsLength.current && prevLogsLength.current > 0) {
+      endRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    prevLogsLength.current = logs.length;
   }, [logs]);
 
   const handleSubmit = async (e: React.FormEvent) => {
