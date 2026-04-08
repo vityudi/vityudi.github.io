@@ -51,9 +51,9 @@ export function TerminalHero() {
               initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-xl overflow-hidden border border-glass-border bg-panel backdrop-blur-xl shadow-2xl relative"
+              className="rounded-xl overflow-hidden border border-glass-border bg-panel/60 backdrop-blur-sm shadow-2xl relative"
             >
-              <div className="bg-black/40 px-4 py-3 flex items-center justify-between border-b border-glass-border">
+              <div className="bg-black/25 px-4 py-3 flex items-center justify-between border-b border-glass-border">
                 <span className="text-xs text-gray-400 font-mono flex items-center gap-2">
                   <Terminal size={14} className="text-neon-cyan" />
                   ~/vitoryudi/dashboard.sh --bash
