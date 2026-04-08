@@ -14,7 +14,7 @@ export function StatusBar() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 h-7 bg-black/90 backdrop-blur border-t border-white/[0.06] flex items-center px-4 select-none">
+    <div className="print:hidden fixed bottom-0 left-0 right-0 z-50 h-7 bg-black/90 backdrop-blur border-t border-white/[0.06] flex items-center px-4 select-none">
       {/* Left — session info */}
       <div className="flex items-center gap-0 h-full shrink-0">
         <div className="flex items-center gap-1.5 bg-neon-green/90 text-black px-2.5 h-full font-mono text-[10px] font-bold tracking-wide">
