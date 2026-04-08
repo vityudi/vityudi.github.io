@@ -2,54 +2,21 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
 import { Play, GitBranch, ChevronLeft, ChevronRight } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import type { Project } from "@/lib/types";
 
 const GAP = 24;
 
-const projects = [
-  {
-    id: "vm-node-01",
-    title: "Gerência Closet",
-    description: "Painel de gestão multi-loja para varejo: controle de produtos, vendas, clientes e equipe em tempo real. Backend com Supabase (PostgreSQL + RLS) e autenticação integrada.",
-    techs: ["Next.js 15", "React 19", "Supabase", "TypeScript", "Tailwind CSS", "TanStack Table", "Recharts"],
-    demo: "https://gerencia-closet.vercel.app/",
-    repo: "#"
-  },
-  {
-    id: "vm-node-02",
-    title: "Film List",
-    description: "App de descoberta e favoritos de filmes com design inspirado no Netflix. Integrado à TMDB API, autenticação via Supabase e compartilhamento público de listas.",
-    techs: ["Next.js", "TypeScript", "Supabase", "Zustand", "TMDB API"],
-    demo: "https://film-list-sandy.vercel.app/",
-    repo: "https://github.com/vityudi/film-list"
-  },
-  {
-    id: "vm-node-03",
-    title: "CoreAPI Gateway",
-    description: "API RESTful escalável com arquitetura de microsserviços: gateway Express.js para roteamento e rate limiting, serviços Python para processamento de dados, autenticação JWT com refresh tokens e documentação OpenAPI automática.",
-    techs: ["Python", "FastAPI", "Django", "Express.js", "JWT", "PostgreSQL", "Docker"],
-    demo: null,
-    repo: null
-  },
-  {
-    id: "vm-node-04",
-    title: "K8s Observability Stack",
-    description: "VPS Ubuntu Server configurada com cluster Kubernetes provisionando pods via manifests e Helm charts. Stack de observabilidade completa com Prometheus para métricas, Loki para logs e Grafana para dashboards unificados.",
-    techs: ["Kubernetes", "Ubuntu Server", "Helm", "Prometheus", "Loki", "Grafana"],
-    demo: "http://grafana.187.77.43.240.nip.io/public-dashboards/3271776dee6845388b793d7e25daf73c",
-    repo: null
-  }
-];
-
-function ProjectCard({ proj }: { proj: typeof projects[number] }) {
+function ProjectCard({ proj, index }: { proj: Project; index: number }) {
   return (
     <div className="relative border border-glass-border bg-panel backdrop-blur-xl rounded-xl overflow-hidden flex flex-col h-[280px]">
       <span className="absolute bottom-2 right-4 font-mono font-black text-[6rem] leading-none text-white/[0.04] select-none pointer-events-none">
-        {proj.id.split("-").pop()}
+        {String(index).padStart(2, "0")}
       </span>
 
       <div className="bg-black/40 px-6 py-4 flex items-center border-b border-glass-border shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-neon-green shadow-[0_0_8px_rgba(0,255,102,0.8)] animate-pulse mr-3" />
-        <span className="font-mono text-sm text-white font-bold mr-auto">{proj.id}</span>
+        <span className="font-mono text-sm text-white font-bold mr-auto">{proj.node_id}</span>
         <span className="font-sans text-xs uppercase tracking-widest text-gray-400">{proj.title}</span>
       </div>
 
@@ -59,7 +26,7 @@ function ProjectCard({ proj }: { proj: typeof projects[number] }) {
         </p>
 
         <div className="flex flex-wrap gap-2 mb-4 overflow-hidden">
-          {proj.techs.map(tech => (
+          {proj.techs.map((tech) => (
             <span key={tech} className="bg-white/5 border border-white/10 px-3 py-1 rounded text-xs font-mono text-neon-cyan shrink-0">
               {tech}
             </span>
@@ -72,7 +39,7 @@ function ProjectCard({ proj }: { proj: typeof projects[number] }) {
               <Play size={14} /> START
             </a>
           )}
-          {proj.repo && proj.repo !== "#" && (
+          {proj.repo && (
             <a href={proj.repo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-transparent text-gray-300 border border-glass-border py-2 px-4 rounded text-xs font-bold hover:border-white hover:text-white transition-colors">
               <GitBranch size={14} /> REPO
             </a>
@@ -84,10 +51,21 @@ function ProjectCard({ proj }: { proj: typeof projects[number] }) {
 }
 
 export function ServerDashboard() {
+  const [projects, setProjects] = useState<Project[]>([]);
   const [current, setCurrent] = useState(0);
   const [visible, setVisible] = useState(2);
   const containerRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
+
+  useEffect(() => {
+    supabase
+      .from("projects")
+      .select("*")
+      .order("sort_order")
+      .then(({ data }) => {
+        if (data) setProjects(data as Project[]);
+      });
+  }, []);
 
   useEffect(() => {
     const update = () => setVisible(window.innerWidth < 768 ? 1 : 2);
@@ -96,7 +74,7 @@ export function ServerDashboard() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const maxIndex = projects.length - visible;
+  const maxIndex = Math.max(0, projects.length - visible);
 
   const getStep = (): number => {
     if (!containerRef.current) return 300;
@@ -117,7 +95,7 @@ export function ServerDashboard() {
   useEffect(() => {
     snapTo(Math.min(current, maxIndex));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
+  }, [visible, projects.length]);
 
   const handleDragEnd = (_: unknown, info: { offset: { x: number } }) => {
     if (info.offset.x < -40) snapTo(current + 1);
@@ -126,6 +104,14 @@ export function ServerDashboard() {
   };
 
   const cardWidth = visible === 1 ? "100%" : `calc((100% - ${GAP}px) / 2)`;
+
+  if (projects.length === 0) {
+    return (
+      <div className="h-[280px] border border-glass-border bg-panel rounded-xl flex items-center justify-center">
+        <span className="font-mono text-xs text-gray-500 animate-pulse">loading projects...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -138,9 +124,9 @@ export function ServerDashboard() {
           onDragEnd={handleDragEnd}
           className="select-none"
         >
-          {projects.map(proj => (
+          {projects.map((proj, i) => (
             <div key={proj.id} style={{ width: cardWidth, flexShrink: 0 }}>
-              <ProjectCard proj={proj} />
+              <ProjectCard proj={proj} index={i + 1} />
             </div>
           ))}
         </motion.div>

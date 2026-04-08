@@ -92,7 +92,7 @@ export function TerminalHero() {
                   <span className="text-term-keyword">#</span> Missão<br />
                   Construir infraestruturas escaláveis e aplicações resilientes.<br />
                   Unir o desenvolvimento de <b>software robusto</b> com <b>visão de produto</b>,
-                  entregando cadeia end-to-end completa com produtos que fazem sentido.
+                  entregando cadeia <br />end-to-end completa com produtos que fazem sentido.
                 </div>
 
                 <div className="flex items-center gap-2 mt-6">
