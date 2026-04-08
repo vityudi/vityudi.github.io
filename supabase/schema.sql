@@ -27,12 +27,22 @@ create table if not exists public.guestbook (
 -- Enable realtime for guestbook
 alter table public.guestbook replica identity full;
 
+-- CV Versions table
+create table if not exists public.cv_versions (
+  id bigint generated always as identity primary key,
+  name text not null,
+  content text not null,
+  is_primary boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
 -- ============================================================
 -- Row Level Security
 -- ============================================================
 
 alter table public.projects enable row level security;
 alter table public.guestbook enable row level security;
+alter table public.cv_versions enable row level security;
 
 -- Projects: anyone can read, only authenticated users can write
 create policy "public read projects"
@@ -48,6 +58,22 @@ create policy "auth update projects"
 
 create policy "auth delete projects"
   on public.projects for delete
+  using (auth.role() = 'authenticated');
+
+-- CV Versions: anyone can read, only authenticated users can write
+create policy "public read cv_versions"
+  on public.cv_versions for select using (true);
+
+create policy "auth insert cv_versions"
+  on public.cv_versions for insert
+  with check (auth.role() = 'authenticated');
+
+create policy "auth update cv_versions"
+  on public.cv_versions for update
+  using (auth.role() = 'authenticated');
+
+create policy "auth delete cv_versions"
+  on public.cv_versions for delete
   using (auth.role() = 'authenticated');
 
 -- Guestbook: anyone can read and insert, only authenticated users can delete

@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 };
 
 import { ScrollProgress } from "@/components/ScrollProgress";
-
 import { MouseGridBackground } from "@/components/MouseGridBackground";
+import { StatusBar } from "@/components/StatusBar";
 
 export default function RootLayout({
   children,
@@ -28,12 +28,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${outfit.variable} ${jetbrainsMono.variable} antialiased min-h-screen text-foreground font-sans relative`}>
+      <body className={`${outfit.variable} ${jetbrainsMono.variable} antialiased min-h-screen text-foreground font-sans relative pb-7`}>
         <MouseGridBackground />
         <ScrollProgress />
         <div className="relative z-1">
           {children}
         </div>
+        <StatusBar />
       </body>
     </html>
   );

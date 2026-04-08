@@ -17,6 +17,14 @@ export type GuestbookEntry = {
   created_at: string;
 };
 
+export type CvVersion = {
+  id: number;
+  name: string;
+  content: string;
+  is_primary: boolean;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {

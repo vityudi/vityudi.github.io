@@ -2,9 +2,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { Reorder, useDragControls } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import type { Project, GuestbookEntry } from "@/lib/types";
+import type { Project, GuestbookEntry, CvVersion } from "@/lib/types";
 import type { Session } from "@supabase/supabase-js";
-import { LogOut, Plus, Trash2, Edit2, X, Check, ExternalLink, GitBranch, GripVertical, Save } from "lucide-react";
+import { LogOut, Plus, Trash2, Edit2, X, Check, ExternalLink, GitBranch, GripVertical, Save, Star, Eye, EyeOff } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -239,10 +240,219 @@ function ProjectEditForm({
   );
 }
 
+// ─── CV Tab ───────────────────────────────────────────────────────────────────
+
+function CvTab() {
+  const [versions, setVersions] = useState<CvVersion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [previewId, setPreviewId] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ name: "", content: "" });
+
+  const load = useCallback(async () => {
+    const { data } = await supabase.from("cv_versions").select("*").order("created_at", { ascending: false });
+    if (data) setVersions(data as CvVersion[]);
+  }, []);
+
+  useEffect(() => {
+    load().finally(() => setLoading(false));
+  }, [load]);
+
+  const openAdd = () => {
+    setForm({ name: "", content: "" });
+    setEditId(null);
+    setShowAdd(true);
+    setPreviewId(null);
+  };
+
+  const openEdit = (v: CvVersion) => {
+    setForm({ name: v.name, content: v.content });
+    setEditId(v.id);
+    setShowAdd(true);
+    setPreviewId(null);
+  };
+
+  const cancelForm = () => {
+    setShowAdd(false);
+    setEditId(null);
+    setForm({ name: "", content: "" });
+  };
+
+  const saveVersion = async () => {
+    if (!form.name.trim() || !form.content.trim()) return;
+    setSaving(true);
+    if (editId) {
+      await supabase.from("cv_versions").update({ name: form.name.trim(), content: form.content.trim() }).eq("id", editId);
+    } else {
+      const isPrimary = versions.length === 0;
+      await supabase.from("cv_versions").insert({ name: form.name.trim(), content: form.content.trim(), is_primary: isPrimary });
+    }
+    await load();
+    cancelForm();
+    setSaving(false);
+  };
+
+  const setPrimary = async (id: number) => {
+    await supabase.from("cv_versions").update({ is_primary: false }).neq("id", -1);
+    await supabase.from("cv_versions").update({ is_primary: true }).eq("id", id);
+    await load();
+  };
+
+  const deleteVersion = async (id: number) => {
+    if (!confirm("Delete this CV version?")) return;
+    await supabase.from("cv_versions").delete().eq("id", id);
+    setPreviewId((p) => (p === id ? null : p));
+    load();
+  };
+
+  const previewVersion = versions.find((v) => v.id === previewId);
+
+  if (loading) return <p className="font-mono text-xs text-gray-500">loading...</p>;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-xs text-gray-400">{versions.length} version{versions.length !== 1 ? "s" : ""}</span>
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-1.5 font-mono text-xs text-neon-green border border-neon-green/50 bg-neon-green/10 px-3 py-1.5 rounded hover:bg-neon-green hover:text-black transition-colors"
+        >
+          <Plus size={12} /> new version
+        </button>
+      </div>
+
+      {/* Form */}
+      {showAdd && (
+        <div className="border border-neon-cyan/40 bg-black/30 rounded-lg p-4 flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <label className="font-mono text-[10px] text-gray-400">version name</label>
+            <input
+              value={form.name}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              placeholder="Backend Focus, DevOps, Full Stack..."
+              className={inputCls}
+              autoFocus
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="font-mono text-[10px] text-gray-400">content (markdown)</label>
+            <textarea
+              value={form.content}
+              onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
+              rows={16}
+              placeholder="# Your Name&#10;&#10;## Experience..."
+              className={`${inputCls} resize-y font-mono text-[11px] leading-relaxed`}
+            />
+          </div>
+          <div className="flex gap-2 justify-end">
+            <button onClick={cancelForm} className="flex items-center gap-1 px-3 py-1.5 font-mono text-xs text-gray-400 border border-glass-border rounded hover:text-white hover:border-white transition-colors">
+              <X size={12} /> cancel
+            </button>
+            <button
+              onClick={saveVersion}
+              disabled={saving || !form.name.trim() || !form.content.trim()}
+              className="flex items-center gap-1 px-3 py-1.5 font-mono text-xs text-neon-green border border-neon-green/50 bg-neon-green/10 rounded hover:bg-neon-green hover:text-black transition-colors disabled:opacity-50"
+            >
+              <Check size={12} /> {saving ? "saving..." : "save"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Version list */}
+      <div className="flex flex-col gap-2">
+        {versions.map((v) => (
+          <div key={v.id} className="flex flex-col gap-0">
+            <div className={`border rounded-lg px-4 py-3 flex items-center gap-3 transition-colors ${v.is_primary ? "border-neon-green/40 bg-neon-green/[0.04]" : "border-glass-border bg-black/20"}`}>
+              {v.is_primary && (
+                <Star size={12} className="text-neon-green shrink-0" fill="currentColor" />
+              )}
+              <div className="flex-1 min-w-0">
+                <span className="font-mono text-sm text-white font-semibold">{v.name}</span>
+                <span className="font-mono text-[10px] text-gray-500 ml-2">
+                  {new Date(v.created_at).toLocaleDateString("pt-BR")}
+                </span>
+                {v.is_primary && (
+                  <span className="ml-2 font-mono text-[10px] text-neon-green border border-neon-green/40 px-1.5 py-0.5 rounded">primary</span>
+                )}
+              </div>
+              <div className="flex gap-1 shrink-0">
+                <button
+                  onClick={() => setPreviewId(previewId === v.id ? null : v.id)}
+                  className="p-1.5 text-gray-400 hover:text-neon-cyan transition-colors"
+                  title="Preview"
+                >
+                  {previewId === v.id ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
+                {!v.is_primary && (
+                  <button
+                    onClick={() => setPrimary(v.id)}
+                    className="p-1.5 text-gray-400 hover:text-neon-green transition-colors"
+                    title="Set as primary"
+                  >
+                    <Star size={14} />
+                  </button>
+                )}
+                <button onClick={() => openEdit(v)} className="p-1.5 text-gray-400 hover:text-neon-cyan transition-colors" title="Edit">
+                  <Edit2 size={14} />
+                </button>
+                <button onClick={() => deleteVersion(v.id)} className="p-1.5 text-gray-400 hover:text-red-400 transition-colors" title="Delete">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+
+            {/* Inline preview */}
+            {previewId === v.id && previewVersion && (
+              <div className="border border-t-0 border-neon-cyan/20 rounded-b-lg bg-black/40 px-6 py-5">
+                <div className="flex justify-end mb-3">
+                  <a
+                    href={`/cv?v=${v.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 font-mono text-xs text-neon-cyan border border-neon-cyan/40 px-3 py-1.5 rounded hover:bg-neon-cyan hover:text-black transition-colors"
+                  >
+                    <ExternalLink size={12} /> open full page
+                  </a>
+                </div>
+                <div className="prose prose-invert prose-sm max-w-none font-sans">
+                  <ReactMarkdown>{previewVersion.content}</ReactMarkdown>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {versions.length === 0 && !showAdd && (
+          <p className="font-mono text-xs text-gray-500 text-center py-8">no CV versions yet — add one above</p>
+        )}
+      </div>
+
+      {versions.length > 0 && (
+        <div className="border border-glass-border rounded-lg px-4 py-3 flex items-center justify-between">
+          <div className="font-mono text-xs text-gray-400">
+            public link: <span className="text-neon-cyan">/cv</span>
+          </div>
+          <a
+            href="/cv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 font-mono text-xs text-gray-400 hover:text-neon-cyan transition-colors"
+          >
+            <ExternalLink size={12} /> view live
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Admin Panel ──────────────────────────────────────────────────────────────
 
 function AdminPanel({ session }: { session: Session }) {
-  const [tab, setTab] = useState<"projects" | "guestbook">("projects");
+  const [tab, setTab] = useState<"projects" | "guestbook" | "cv">("projects");
   const [projects, setProjects] = useState<Project[]>([]);
   const [guestbook, setGuestbook] = useState<GuestbookEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -338,7 +548,7 @@ function AdminPanel({ session }: { session: Session }) {
       <div className="max-w-4xl mx-auto p-6 flex flex-col gap-6">
         {/* Tabs */}
         <div className="flex gap-1 border-b border-glass-border">
-          {(["projects", "guestbook"] as const).map((t) => (
+          {(["projects", "guestbook", "cv"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -457,6 +667,9 @@ function AdminPanel({ session }: { session: Session }) {
                 )}
               </div>
             )}
+
+            {/* ── CV Tab ── */}
+            {tab === "cv" && <CvTab />}
           </>
         )}
       </div>

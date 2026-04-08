@@ -95,7 +95,42 @@ export function TerminalHero() {
                   entregando cadeia <br />end-to-end completa com produtos que fazem sentido.
                 </div>
 
-                <div className="flex items-center gap-2 mt-6">
+                <div className="flex items-center gap-2 mt-6 mb-3">
+                  <span className="text-neon-green font-bold">root@yudi:~#</span>
+                  <span className="text-term-keyword">wget</span>
+                  <span className="text-term-string">curriculum.pdf</span>
+                </div>
+
+                <a
+                  href="/cv"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group ml-4 pl-4 border-l-2 border-white/10 flex items-center gap-3 w-fit hover:border-neon-cyan/40 transition-colors"
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 font-mono">
+                      <span className="text-neon-cyan">Saving:</span>
+                      <span>curriculum.pdf</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-px">
+                        {Array.from({ length: 10 }).map((_, i) => (
+                          <span
+                            key={i}
+                            className="inline-block w-3 h-2 bg-neon-cyan/70 group-hover:bg-neon-cyan transition-colors"
+                            style={{ transitionDelay: `${i * 20}ms` }}
+                          />
+                        ))}
+                      </div>
+                      <span className="font-mono text-xs text-gray-400">100%</span>
+                      <span className="font-mono text-xs text-neon-cyan font-bold group-hover:underline">
+                        open ↗
+                      </span>
+                    </div>
+                  </div>
+                </a>
+
+                <div className="flex items-center gap-2 mt-4">
                   <span className="text-neon-green font-bold">root@yudi:~#</span>
                   <span className="w-2.5 h-[1.2em] bg-neon-cyan inline-block animate-pulse"></span>
                 </div>
