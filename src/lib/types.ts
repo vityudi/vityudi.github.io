@@ -25,6 +25,13 @@ export type CvVersion = {
   created_at: string;
 };
 
+export type CvAccessToken = {
+  id: number;
+  value: string;
+  label: string | null;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {

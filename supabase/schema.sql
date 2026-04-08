@@ -86,3 +86,33 @@ create policy "public insert guestbook"
 create policy "auth delete guestbook"
   on public.guestbook for delete
   using (auth.role() = 'authenticated');
+
+-- CV Access Tokens table
+create table if not exists public.cv_access_tokens (
+  id serial primary key,
+  value text not null unique,
+  label text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.cv_access_tokens enable row level security;
+
+-- Only authenticated users (admin) can manage tokens
+create policy "admin_all cv_access_tokens"
+  on public.cv_access_tokens for all
+  to authenticated using (true) with check (true);
+
+-- Secure function to validate a credential without exposing the token list
+create or replace function public.check_cv_token(credential text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return exists (
+    select 1 from public.cv_access_tokens
+    where lower(value) = lower(credential)
+  );
+end;
+$$;

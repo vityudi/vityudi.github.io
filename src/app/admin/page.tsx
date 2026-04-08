@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Reorder, useDragControls } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import type { Project, GuestbookEntry, CvVersion } from "@/lib/types";
+import type { Project, GuestbookEntry, CvVersion, CvAccessToken } from "@/lib/types";
 import type { Session } from "@supabase/supabase-js";
 import { LogOut, Plus, Trash2, Edit2, X, Check, ExternalLink, GitBranch, GripVertical, Save, Star, Eye, EyeOff } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -449,10 +449,143 @@ function CvTab() {
   );
 }
 
+// ─── Access Tab ───────────────────────────────────────────────────────────────
+
+function AccessTab() {
+  const [tokens, setTokens] = useState<CvAccessToken[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
+  const [form, setForm] = useState({ value: "", label: "" });
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from("cv_access_tokens")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setTokens(data as CvAccessToken[]);
+  }, []);
+
+  useEffect(() => {
+    load().finally(() => setLoading(false));
+  }, [load]);
+
+  const add = async () => {
+    if (!form.value.trim()) return;
+    setSaving(true);
+    await supabase.from("cv_access_tokens").insert({
+      value: form.value.trim().toLowerCase(),
+      label: form.label.trim() || null,
+    });
+    await load();
+    setForm({ value: "", label: "" });
+    setShowAdd(false);
+    setSaving(false);
+  };
+
+  const remove = async (id: number) => {
+    if (!confirm("Remover este token de acesso?")) return;
+    await supabase.from("cv_access_tokens").delete().eq("id", id);
+    load();
+  };
+
+  if (loading) return <p className="font-mono text-xs text-gray-500">loading...</p>;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-xs text-gray-400">
+          {tokens.length} token{tokens.length !== 1 ? "s" : ""}
+        </span>
+        <button
+          onClick={() => setShowAdd(true)}
+          className="flex items-center gap-1.5 font-mono text-xs text-neon-green border border-neon-green/50 bg-neon-green/10 px-3 py-1.5 rounded hover:bg-neon-green hover:text-black transition-colors"
+        >
+          <Plus size={12} /> add token
+        </button>
+      </div>
+
+      {showAdd && (
+        <div className="border border-neon-cyan/40 bg-black/30 rounded-lg p-4 flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <label className="font-mono text-[10px] text-gray-400">email ou token</label>
+            <input
+              value={form.value}
+              onChange={(e) => setForm((f) => ({ ...f, value: e.target.value }))}
+              placeholder="recruiter@empresa.com ou s3cr3t42"
+              className={inputCls}
+              autoFocus
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="font-mono text-[10px] text-gray-400">label (opcional)</label>
+            <input
+              value={form.label}
+              onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
+              placeholder="Google Recruiter"
+              className={inputCls}
+            />
+          </div>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => { setShowAdd(false); setForm({ value: "", label: "" }); }}
+              className="flex items-center gap-1 px-3 py-1.5 font-mono text-xs text-gray-400 border border-glass-border rounded hover:text-white hover:border-white transition-colors"
+            >
+              <X size={12} /> cancel
+            </button>
+            <button
+              onClick={add}
+              disabled={saving || !form.value.trim()}
+              className="flex items-center gap-1 px-3 py-1.5 font-mono text-xs text-neon-green border border-neon-green/50 bg-neon-green/10 rounded hover:bg-neon-green hover:text-black transition-colors disabled:opacity-50"
+            >
+              <Check size={12} /> {saving ? "saving..." : "save"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col gap-2">
+        {tokens.map((t) => (
+          <div key={t.id} className="border border-glass-border bg-black/20 rounded-lg px-4 py-3 flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <span className="font-mono text-sm text-neon-cyan">{t.value}</span>
+              {t.label && (
+                <span className="font-mono text-xs text-gray-500 ml-2">({t.label})</span>
+              )}
+              <span className="font-mono text-[10px] text-gray-600 ml-2">
+                {new Date(t.created_at).toLocaleDateString("pt-BR")}
+              </span>
+            </div>
+            <button
+              onClick={() => remove(t.id)}
+              className="p-1.5 text-gray-500 hover:text-red-400 transition-colors"
+              title="Remove"
+            >
+              <Trash2 size={13} />
+            </button>
+          </div>
+        ))}
+        {tokens.length === 0 && !showAdd && (
+          <p className="font-mono text-xs text-gray-500 text-center py-8">
+            nenhum token cadastrado — adicione um acima
+          </p>
+        )}
+      </div>
+
+      <div className="border border-glass-border rounded-lg px-4 py-3">
+        <p className="font-mono text-xs text-gray-400 leading-relaxed">
+          visitantes precisam digitar um e-mail ou token cadastrado aqui para acessar{" "}
+          <span className="text-neon-cyan">/cv</span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Admin Panel ──────────────────────────────────────────────────────────────
 
 function AdminPanel({ session }: { session: Session }) {
-  const [tab, setTab] = useState<"projects" | "guestbook" | "cv">("projects");
+  const [tab, setTab] = useState<"projects" | "guestbook" | "cv" | "access">("projects");
   const [projects, setProjects] = useState<Project[]>([]);
   const [guestbook, setGuestbook] = useState<GuestbookEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -548,7 +681,7 @@ function AdminPanel({ session }: { session: Session }) {
       <div className="max-w-4xl mx-auto p-6 flex flex-col gap-6">
         {/* Tabs */}
         <div className="flex gap-1 border-b border-glass-border">
-          {(["projects", "guestbook", "cv"] as const).map((t) => (
+          {(["projects", "guestbook", "cv", "access"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -670,6 +803,9 @@ function AdminPanel({ session }: { session: Session }) {
 
             {/* ── CV Tab ── */}
             {tab === "cv" && <CvTab />}
+
+            {/* ── Access Tab ── */}
+            {tab === "access" && <AccessTab />}
           </>
         )}
       </div>
