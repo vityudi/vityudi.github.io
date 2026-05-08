@@ -181,7 +181,7 @@ export function MouseGridBackground() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+    <div className="print:hidden fixed inset-0 z-0 overflow-hidden pointer-events-none">
       {/* Dynamic light following mouse */}
       <div ref={lightRef} className="absolute inset-0 z-[1]" />
 
