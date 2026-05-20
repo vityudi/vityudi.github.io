@@ -10,7 +10,7 @@ interface ScrollRevealProps {
 
 export function ScrollReveal({ children, delay = 0, direction = "up", className = "" }: ScrollRevealProps) {
   const getInitial = () => {
-    const base = { opacity: 0, scale: 0.96, filter: "blur(6px)" };
+    const base = { opacity: 0, scale: 0.96 };
     switch (direction) {
       case "up":    return { ...base, y: 60 };
       case "down":  return { ...base, y: -60 };
@@ -24,16 +24,13 @@ export function ScrollReveal({ children, delay = 0, direction = "up", className 
   return (
     <motion.div
       initial={getInitial()}
-      whileInView={{ x: 0, y: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
+      whileInView={{ x: 0, y: 0, opacity: 1, scale: 1 }}
       viewport={{ once: false, margin: "-80px" }}
       transition={{
-        // Spring for spatial transforms — gives a natural "snap in" feel
-        y:      { type: "spring", stiffness: 70, damping: 20, delay },
-        x:      { type: "spring", stiffness: 70, damping: 20, delay },
-        scale:  { type: "spring", stiffness: 70, damping: 20, delay },
-        // Tween for opacity/blur — springs on these look wrong
+        y:       { type: "spring", stiffness: 70, damping: 20, delay },
+        x:       { type: "spring", stiffness: 70, damping: 20, delay },
+        scale:   { type: "spring", stiffness: 70, damping: 20, delay },
         opacity: { duration: 0.55, delay, ease: "easeOut" },
-        filter:  { duration: 0.55, delay, ease: "easeOut" },
       }}
       className={className}
     >

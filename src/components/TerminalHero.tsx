@@ -51,7 +51,7 @@ export function TerminalHero() {
               initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-xl overflow-hidden border border-glass-border bg-panel/60 backdrop-blur-sm shadow-2xl relative"
+              className="rounded-xl overflow-hidden border border-glass-border bg-panel/60 backdrop-blur-md shadow-2xl relative"
             >
               <div className="bg-black/25 px-4 py-3 flex items-center justify-between border-b border-glass-border">
                 <span className="text-xs text-gray-400 font-mono flex items-center gap-2">
@@ -148,7 +148,7 @@ export function TerminalHero() {
           transition={{ duration: 1.0, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col gap-6"
         >
-          <div className="p-6 rounded-xl border border-glass-border bg-panel backdrop-blur-xl shadow-lg flex items-center gap-4 group hover:border-neon-green/30 transition-colors">
+          <div className="p-6 rounded-xl border border-glass-border bg-panel backdrop-blur-md shadow-lg flex items-center gap-4 group hover:border-neon-green/30 transition-colors">
             <div className="w-12 h-12 rounded-xl bg-neon-green/10 text-neon-green flex items-center justify-center group-hover:scale-110 transition-transform">
               <Server size={24} />
             </div>

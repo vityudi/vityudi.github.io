@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import type { GuestbookEntry } from "@/lib/types";
 
@@ -10,6 +10,8 @@ export function GuestbookTerminal() {
   const [submitting, setSubmitting] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const prevLogsLength = useRef(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(containerRef, { once: false });
 
   // Initial fetch
   useEffect(() => {
@@ -79,7 +81,14 @@ export function GuestbookTerminal() {
     new Date(iso).toLocaleTimeString("en-US", { hour12: false });
 
   return (
-    <div className="rounded-xl overflow-hidden border border-glass-border bg-panel backdrop-blur-xl shadow-2xl flex flex-col h-[400px]">
+    <div
+      ref={containerRef}
+      style={{
+        transition: "backdrop-filter 1s ease",
+        backdropFilter: inView ? "blur(12px)" : "blur(0px)",
+      }}
+      className="rounded-xl overflow-hidden border border-glass-border bg-panel shadow-2xl flex flex-col h-[400px]"
+    >
 
       {/* Header */}
       <div className="bg-black/40 px-4 py-3 flex items-center justify-between border-b border-glass-border">

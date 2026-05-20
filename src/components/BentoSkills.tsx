@@ -1,6 +1,6 @@
 "use client";
 import { useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { Cloud, Container, Settings, Box, Database, Zap } from "lucide-react";
 import { FaReact, FaPython } from "react-icons/fa";
 import { SiDjango } from "react-icons/si";
@@ -20,26 +20,32 @@ function TiltCard({ children, className, maxTilt = 8 }: {
   className?: string;
   maxTilt?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const tiltRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(wrapRef, { once: false, margin: "-60px" });
 
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
+    if (!tiltRef.current) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
-    ref.current.style.transform = `perspective(800px) rotateX(${(-y * maxTilt * 2).toFixed(2)}deg) rotateY(${(x * maxTilt * 2).toFixed(2)}deg) scale3d(1.02,1.02,1.02)`;
+    tiltRef.current.style.transform = `perspective(800px) rotateX(${(-y * maxTilt * 2).toFixed(2)}deg) rotateY(${(x * maxTilt * 2).toFixed(2)}deg) scale3d(1.02,1.02,1.02)`;
   };
 
   const onMouseLeave = () => {
-    if (!ref.current) return;
-    ref.current.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
+    if (!tiltRef.current) return;
+    tiltRef.current.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
   };
 
   return (
-    <div className="h-full" onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}>
+    <div ref={wrapRef} className="h-full" onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}>
       <div
-        ref={ref}
-        style={{ transition: "transform 0.18s ease-out", willChange: "transform" }}
+        ref={tiltRef}
+        style={{
+          transition: "transform 0.18s ease-out, backdrop-filter 1s ease",
+          willChange: "transform",
+          backdropFilter: inView ? "blur(12px)" : "blur(0px)",
+        }}
         className={className}
       >
         {children}
@@ -55,8 +61,8 @@ export function BentoSkills() {
   };
 
   const item = {
-    hidden: { opacity: 0, y: 25, filter: "blur(4px)" },
-    show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } },
+    hidden: { opacity: 0, y: 25 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } },
   };
 
   return (
@@ -69,7 +75,7 @@ export function BentoSkills() {
     >
       {/* Cloud Card (Large) */}
       <motion.div variants={item} className="col-span-2 row-span-2">
-        <TiltCard maxTilt={5} className="h-full rounded-xl p-6 border border-glass-border bg-linear-to-br from-white/5 to-white/2 backdrop-blur-xl relative overflow-hidden group">
+        <TiltCard maxTilt={5} className="h-full rounded-xl p-6 border border-glass-border bg-linear-to-br from-white/5 to-white/2 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <Cloud size={120} />
           </div>
@@ -98,7 +104,7 @@ export function BentoSkills() {
 
       {/* Containers Card (Medium) */}
       <motion.div variants={item} className="col-span-2 row-span-1">
-        <TiltCard maxTilt={4} className="h-full border border-glass-border bg-panel backdrop-blur-xl rounded-xl p-6 flex flex-col group relative overflow-hidden">
+        <TiltCard maxTilt={4} className="h-full border border-glass-border bg-panel rounded-xl p-6 flex flex-col group relative overflow-hidden">
           <div className="flex items-center gap-2 font-sans font-semibold text-white mb-4 relative z-10">
             <Container className="text-blue-500" /> Containers & DevOps
           </div>
@@ -118,7 +124,7 @@ export function BentoSkills() {
       {/* Small Cards */}
       {smallSkills.map((skill, i) => (
         <motion.div key={i} variants={item} className="col-span-1 row-span-1">
-          <TiltCard maxTilt={12} className="h-full border border-glass-border bg-panel backdrop-blur-xl rounded-xl p-4 flex flex-col items-center justify-center gap-3 group cursor-default">
+          <TiltCard maxTilt={12} className="h-full border border-glass-border bg-panel rounded-xl p-4 flex flex-col items-center justify-center gap-3 group cursor-default">
             <skill.icon size={32} className={`${skill.color} drop-shadow-md transition-transform duration-200 group-hover:scale-110`} />
             <span className="font-mono text-sm text-gray-300 text-center">{skill.name}</span>
           </TiltCard>

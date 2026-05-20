@@ -43,7 +43,7 @@ export function MouseGridBackground() {
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (lightRef.current) {
-        lightRef.current.style.background = `radial-gradient(800px circle at ${e.clientX}px ${e.clientY}px, rgba(0, 240, 255, 0.12), transparent 40%)`;
+        lightRef.current.style.background = `radial-gradient(800px circle at ${e.clientX}px ${e.clientY}px, rgba(0, 240, 255, 0.015), transparent 40%)`;
       }
     };
     window.addEventListener("mousemove", handleMouseMove);

@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
-import { motion, useMotionValue, animate } from "framer-motion";
+import { motion, useMotionValue, animate, useInView } from "framer-motion";
 import { Play, GitBranch, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Project } from "@/lib/types";
@@ -8,8 +8,18 @@ import type { Project } from "@/lib/types";
 const GAP = 24;
 
 function ProjectCard({ proj, index }: { proj: Project; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: false, margin: "-60px" });
+
   return (
-    <div className="relative border border-glass-border bg-panel backdrop-blur-xl rounded-xl overflow-hidden flex flex-col h-[280px]">
+    <div
+      ref={ref}
+      style={{
+        transition: "backdrop-filter 1s ease",
+        backdropFilter: inView ? "blur(12px)" : "blur(0px)",
+      }}
+      className="relative border border-glass-border bg-panel rounded-xl overflow-hidden flex flex-col h-[280px]"
+    >
       <span className="absolute bottom-2 right-4 font-mono font-black text-[6rem] leading-none text-white/[0.04] select-none pointer-events-none">
         {String(index).padStart(2, "0")}
       </span>
