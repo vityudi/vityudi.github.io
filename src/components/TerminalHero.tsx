@@ -21,8 +21,7 @@ export function TerminalHero() {
 
   const onTerminalMouseLeave = () => {
     if (!terminalTiltRef.current) return;
-    terminalTiltRef.current.style.transform =
-      "perspective(900px) rotateX(0deg) rotateY(0deg)";
+    terminalTiltRef.current.style.transform = "";
   };
 
   return (
@@ -35,20 +34,19 @@ export function TerminalHero() {
       </div>
 
       <h1 className="font-display font-black text-5xl md:text-[58px] leading-[0.96] tracking-[-0.015em] m-0">
-        VITOR YUDI.
+        VITOR YUDI
       </h1>
 
       <div className="inline-flex items-center gap-2 mt-3.5">
         <span className="w-1.5 h-1.5 rounded-full bg-neon-green inline-block" />
         <span className="font-mono font-semibold text-lg md:text-[22px] tracking-[0.08em] text-accent uppercase">
-          Fullstack &amp; DevOps
+          SOFTWARE ENGINEER
         </span>
       </div>
 
-      <p className="max-w-[54ch] text-sm leading-relaxed text-gray-400 mt-5 font-mono">
+      <p className="max-w-[72ch] text-sm leading-relaxed text-gray-400 mt-5 font-mono">
         Desenvolvedor fullstack e engenheiro DevOps com visão de produto. Projeto, construo e opero
-        sistemas de ponta a ponta — do front-end à infraestrutura cloud — traduzindo requisitos de
-        negócio em software confiável e pronto para escalar.
+        sistemas de ponta a ponta, traduzindo requisitos de negócio em software confiável e pronto para escalar.
       </p>
 
       {/* Terminal window */}
@@ -60,7 +58,7 @@ export function TerminalHero() {
         >
           <div
             ref={terminalTiltRef}
-            style={{ transition: "transform 0.18s ease-out", willChange: "transform" }}
+            style={{ transition: "transform 0.18s ease-out" }}
           >
             <motion.div
               initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}

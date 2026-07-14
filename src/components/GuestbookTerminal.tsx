@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import type { GuestbookEntry } from "@/lib/types";
 
@@ -10,8 +10,6 @@ export function GuestbookTerminal() {
   const [submitting, setSubmitting] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const prevLogsLength = useRef(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(containerRef, { once: false });
 
   // Initial fetch
   useEffect(() => {
@@ -81,17 +79,10 @@ export function GuestbookTerminal() {
     new Date(iso).toLocaleTimeString("en-US", { hour12: false });
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        transition: "backdrop-filter 1s ease",
-        backdropFilter: inView ? "blur(12px)" : "blur(0px)",
-      }}
-      className="rounded-xl overflow-hidden border border-glass-border bg-panel shadow-2xl flex flex-col h-[400px]"
-    >
+    <div className="rounded-xl overflow-hidden border border-glass-border bg-panel backdrop-blur-[2.5px] saturate-150 shadow-2xl flex flex-col h-[400px]">
 
       {/* Header */}
-      <div className="bg-panel-solid px-4 py-3 flex items-center justify-between border-b border-glass-border">
+      <div className="bg-panel-solid backdrop-blur-[2.5px] saturate-150 px-4 py-3 flex items-center justify-between border-b border-glass-border">
         <span className="text-xs text-gray-400 font-mono">visitors.log — live</span>
         <span className="text-xs text-neon-green flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-neon-green animate-pulse"></span> DB Connected
