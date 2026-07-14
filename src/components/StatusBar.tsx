@@ -17,13 +17,13 @@ export function StatusBar() {
     <div className="print:hidden fixed bottom-0 left-0 right-0 z-50 h-7 bg-black/90 backdrop-blur border-t border-white/[0.06] flex items-center px-4 select-none">
       {/* Left — session info */}
       <div className="flex items-center gap-0 h-full shrink-0">
-        <div className="flex items-center gap-1.5 bg-neon-green/90 text-black px-2.5 h-full font-mono text-[10px] font-bold tracking-wide">
+        <div className="flex items-center gap-1.5 bg-accent/90 text-black px-2.5 h-full font-mono text-[10px] font-bold tracking-wide">
           <span className="w-1.5 h-1.5 rounded-full bg-black/40 inline-block" />
           NORMAL
         </div>
-        <div className="w-0 h-0 border-t-[14px] border-b-[14px] border-l-[8px] border-t-transparent border-b-transparent border-l-neon-green/90" />
+        <div className="w-0 h-0 border-t-[14px] border-b-[14px] border-l-[8px] border-t-transparent border-b-transparent border-l-accent/90" />
         <span className="font-mono text-[10px] text-gray-400 px-3 hidden sm:inline">
-          root@yudi:<span className="text-neon-cyan">~/vitoryudi</span>
+          root@vyudi:<span className="text-neon-cyan">~/vitoryudi</span>
         </span>
       </div>
 
@@ -46,7 +46,7 @@ export function StatusBar() {
           href="https://www.linkedin.com/in/vitoryudi/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 px-3 h-full text-gray-400 hover:text-neon-cyan transition-colors"
+          className="flex items-center gap-1.5 px-3 h-full text-gray-400 hover:text-accent transition-colors"
           title="linkedin.com/in/vitoryudi"
         >
           <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>

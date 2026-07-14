@@ -91,8 +91,8 @@ export function GuestbookTerminal() {
     >
 
       {/* Header */}
-      <div className="bg-black/40 px-4 py-3 flex items-center justify-between border-b border-glass-border">
-        <span className="text-xs text-gray-400 font-mono">live_visitor_stream - tail -f /var/log/visitors</span>
+      <div className="bg-panel-solid px-4 py-3 flex items-center justify-between border-b border-glass-border">
+        <span className="text-xs text-gray-400 font-mono">visitors.log — live</span>
         <span className="text-xs text-neon-green flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-neon-green animate-pulse"></span> DB Connected
         </span>
@@ -111,7 +111,7 @@ export function GuestbookTerminal() {
             className="mb-3 leading-relaxed"
           >
             <span className="text-gray-500">[{formatTime(log.created_at)}]</span>{" "}
-            <span className="text-neon-cyan font-bold">{log.username}:</span>{" "}
+            <span className="text-term-func font-bold">{log.username}:</span>{" "}
             <span className="text-gray-300">{log.message}</span>
           </motion.div>
         ))}
@@ -119,15 +119,14 @@ export function GuestbookTerminal() {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-black/60 border-t border-glass-border">
+      <div className="p-4 bg-black/40 border-t border-glass-border">
         <form onSubmit={handleSubmit} className="flex items-center gap-3 font-mono">
-          <span className="text-neon-green font-bold shrink-0">guest@yudi:~#</span>
-          <span className="text-term-keyword shrink-0">echo</span>
+          <span className="text-term-keyword font-bold shrink-0">guest@vyudi:~$</span>
           <input
             type="text"
             value={command}
             onChange={(e) => setCommand(e.target.value)}
-            placeholder='"Your message here" >> /var/log/visitors'
+            placeholder='echo "sua mensagem aqui" >> /var/log/visitors'
             className="flex-1 bg-transparent border-none outline-none text-term-string placeholder:text-gray-600 focus:ring-0 w-full"
             autoComplete="off"
             spellCheck="false"

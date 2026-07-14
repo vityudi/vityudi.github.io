@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Unbounded, Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const unbounded = Unbounded({
+  variable: "--font-unbounded",
   subsets: ["latin"],
+  weight: ["400", "600", "700", "800", "900"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -20,6 +27,7 @@ export const metadata: Metadata = {
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { MouseGridBackground } from "@/components/MouseGridBackground";
 import { StatusBar } from "@/components/StatusBar";
+import { TopBar } from "@/components/TopBar";
 
 export default function RootLayout({
   children,
@@ -28,9 +36,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${outfit.variable} ${jetbrainsMono.variable} antialiased min-h-screen text-foreground font-sans relative pb-7`}>
+      <body className={`${unbounded.variable} ${manrope.variable} ${jetbrainsMono.variable} antialiased min-h-screen text-foreground font-sans relative pb-7`}>
         <MouseGridBackground />
         <ScrollProgress />
+        <TopBar />
         <div className="relative z-1">
           {children}
         </div>

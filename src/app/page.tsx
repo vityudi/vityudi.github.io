@@ -4,28 +4,35 @@ import { ServerDashboard } from "@/components/ServerDashboard";
 import { GuestbookTerminal } from "@/components/GuestbookTerminal";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
+function CommandLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="font-mono text-[11px] tracking-[0.14em] mb-3.5">
+      <span className="text-term-keyword">$</span>{" "}
+      <span className="text-term-func">ls</span>{" "}
+      <span className="text-term-string">-la</span>{" "}
+      <span className="text-gray-300">{children}</span>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
-    <main className="max-w-300 mx-auto px-4 py-32 flex flex-col gap-40 min-h-[150vh]">
+    <main className="max-w-240 mx-auto px-4 py-14 flex flex-col gap-14 min-h-[150vh]">
       {/* 1. Hero Module */}
       <TerminalHero />
 
       {/* 2. Skills Module */}
       <ScrollReveal direction="up" delay={0.2}>
         <section id="stack">
-          <h2 className="text-4xl font-bold bg-linear-to-r from-white to-gray-500 bg-clip-text text-transparent mb-12 uppercase tracking-wide inline-block">
-            Stack_
-          </h2>
+          <CommandLabel>./stack</CommandLabel>
           <BentoSkills />
         </section>
       </ScrollReveal>
 
       {/* 3. Projects Module */}
       <ScrollReveal direction="up" delay={0.2}>
-        <section id="deploy" className="scroll-mt-40">
-          <h2 className="text-4xl font-bold bg-linear-to-r from-white to-gray-500 bg-clip-text text-transparent mb-12 uppercase tracking-wide inline-block">
-            Instâncias_Ativas
-          </h2>
+        <section id="deploy" className="scroll-mt-24">
+          <CommandLabel>./projetos_em_destaque</CommandLabel>
           <ServerDashboard />
         </section>
       </ScrollReveal>
@@ -33,9 +40,12 @@ export default function Home() {
       {/* 4. Fullstack Supabase Integration */}
       <ScrollReveal direction="up" delay={0.2}>
         <section id="logs">
-          <h2 className="text-4xl font-bold bg-linear-to-r from-neon-cyan to-white bg-clip-text text-transparent mb-12 uppercase tracking-wide inline-block">
-            /var/log/visitors
-          </h2>
+          <div className="font-mono text-[11px] tracking-[0.14em] mb-3.5">
+            <span className="text-term-keyword">$</span>{" "}
+            <span className="text-term-func">tail</span>{" "}
+            <span className="text-term-string">-f</span>{" "}
+            <span className="text-gray-300">/var/log/visitors</span>
+          </div>
           <GuestbookTerminal />
         </section>
       </ScrollReveal>

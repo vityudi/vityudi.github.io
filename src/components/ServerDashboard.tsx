@@ -1,71 +1,28 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
-import { motion, useMotionValue, animate, useInView } from "framer-motion";
-import { Play, GitBranch, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import type { Project } from "@/lib/types";
 
-const GAP = 24;
+function guessKind(proj: Project): string {
+  const techs = proj.techs.map((t) => t.toLowerCase());
+  if (techs.some((t) => t.includes("kubernetes") || t.includes("docker") || t.includes("helm") || t.includes("prometheus") || t.includes("grafana"))) {
+    return "Infraestrutura";
+  }
+  if (!proj.demo && proj.repo) return "API";
+  return "Produto";
+}
 
-function ProjectCard({ proj, index }: { proj: Project; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: false, margin: "-60px" });
-
-  return (
-    <div
-      ref={ref}
-      style={{
-        transition: "backdrop-filter 1s ease",
-        backdropFilter: inView ? "blur(12px)" : "blur(0px)",
-      }}
-      className="relative border border-glass-border bg-panel rounded-xl overflow-hidden flex flex-col h-[280px]"
-    >
-      <span className="absolute bottom-2 right-4 font-mono font-black text-[6rem] leading-none text-white/[0.04] select-none pointer-events-none">
-        {String(index).padStart(2, "0")}
-      </span>
-
-      <div className="bg-black/40 px-6 py-4 flex items-center border-b border-glass-border shrink-0">
-        <div className="w-2.5 h-2.5 rounded-full bg-neon-green shadow-[0_0_8px_rgba(0,255,102,0.8)] animate-pulse mr-3" />
-        <span className="font-mono text-sm text-white font-bold mr-auto">{proj.node_id}</span>
-        <span className="font-sans text-xs uppercase tracking-widest text-gray-400">{proj.title}</span>
-      </div>
-
-      <div className="p-6 flex-1 flex flex-col min-h-0">
-        <p className="text-gray-300 text-sm leading-relaxed mb-4 line-clamp-2">
-          {proj.description}
-        </p>
-
-        <div className="flex flex-wrap gap-2 mb-4 overflow-hidden">
-          {proj.techs.map((tech) => (
-            <span key={tech} className="bg-white/5 border border-white/10 px-3 py-1 rounded text-xs font-mono text-neon-cyan shrink-0">
-              {tech}
-            </span>
-          ))}
-        </div>
-
-        <div className="flex gap-3 mt-auto">
-          {proj.demo && (
-            <a href={proj.demo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-neon-green/10 text-neon-green border border-neon-green/50 py-2 px-4 rounded text-xs font-bold hover:bg-neon-green hover:text-black transition-colors">
-              <Play size={14} /> START
-            </a>
-          )}
-          {proj.repo && (
-            <a href={proj.repo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-transparent text-gray-300 border border-glass-border py-2 px-4 rounded text-xs font-bold hover:border-white hover:text-white transition-colors">
-              <GitBranch size={14} /> REPO
-            </a>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+function tabStyle(active: boolean) {
+  return [
+    "font-mono text-[11.5px] px-4 py-2.5 rounded-t-lg whitespace-nowrap cursor-pointer transition-colors",
+    active ? "bg-panel text-foreground font-semibold" : "bg-transparent text-gray-500 font-medium hover:text-gray-300",
+  ].join(" ");
 }
 
 export function ServerDashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [current, setCurrent] = useState(0);
-  const [visible, setVisible] = useState(2);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
+  const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => {
     supabase
@@ -77,44 +34,6 @@ export function ServerDashboard() {
       });
   }, []);
 
-  useEffect(() => {
-    const update = () => setVisible(window.innerWidth < 768 ? 1 : 2);
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  const maxIndex = Math.max(0, projects.length - visible);
-
-  const getStep = (): number => {
-    if (!containerRef.current) return 300;
-    return (containerRef.current.offsetWidth - GAP * (visible - 1)) / visible + GAP;
-  };
-
-  const snapTo = (index: number) => {
-    const clamped = Math.max(0, Math.min(index, maxIndex));
-    setCurrent(clamped);
-    animate(x, -clamped * getStep(), {
-      type: "spring",
-      stiffness: 55,
-      damping: 18,
-      mass: 1.4,
-    });
-  };
-
-  useEffect(() => {
-    snapTo(Math.min(current, maxIndex));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible, projects.length]);
-
-  const handleDragEnd = (_: unknown, info: { offset: { x: number } }) => {
-    if (info.offset.x < -40) snapTo(current + 1);
-    else if (info.offset.x > 40) snapTo(current - 1);
-    else snapTo(current);
-  };
-
-  const cardWidth = visible === 1 ? "100%" : `calc((100% - ${GAP}px) / 2)`;
-
   if (projects.length === 0) {
     return (
       <div className="h-[280px] border border-glass-border bg-panel rounded-xl flex items-center justify-center">
@@ -123,53 +42,91 @@ export function ServerDashboard() {
     );
   }
 
+  const active = projects[Math.min(activeIdx, projects.length - 1)];
+  const kind = guessKind(active);
+  const isLive = Boolean(active.demo);
+
   return (
-    <div className="flex flex-col gap-6">
-      <div ref={containerRef} className="overflow-hidden cursor-grab active:cursor-grabbing">
-        <motion.div
-          drag="x"
-          dragConstraints={containerRef}
-          dragElastic={1}
-          style={{ x, display: "flex", gap: GAP }}
-          onDragEnd={handleDragEnd}
-          className="select-none"
-        >
-          {projects.map((proj, i) => (
-            <div key={proj.id} style={{ width: cardWidth, flexShrink: 0 }}>
-              <ProjectCard proj={proj} index={i + 1} />
+    <div className="rounded-xl overflow-hidden border border-glass-border shadow-2xl">
+      {/* window chrome: traffic lights + document tabs */}
+      <div className="flex items-center gap-3.5 px-2.5 pt-2.5 bg-panel-solid backdrop-blur-[2.5px] saturate-150">
+        <div className="flex items-center gap-2 pl-1">
+          <span className="w-3 h-3 rounded-full bg-[#ff5f57] inline-block" />
+          <span className="w-3 h-3 rounded-full bg-[#febc2e] inline-block" />
+          <span className="w-3 h-3 rounded-full bg-[#28c840] inline-block" />
+        </div>
+        <div className="flex gap-0.5 flex-1 overflow-x-auto">
+          {projects.map((p, i) => (
+            <div key={p.id} onClick={() => setActiveIdx(i)} className={tabStyle(i === activeIdx)}>
+              {p.node_id}
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => snapTo(current - 1)}
-          className="w-9 h-9 flex items-center justify-center rounded border border-glass-border text-gray-400 hover:border-white hover:text-white transition-colors"
-        >
-          <ChevronLeft size={18} />
-        </button>
+      <div className="bg-panel backdrop-blur-[2.5px] saturate-150 px-6 py-7 md:px-8">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={active.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="flex justify-between items-start mb-1.5">
+              <div>
+                <span className="font-display font-bold text-xl md:text-[23px]">
+                  {active.title}
+                </span>
+                <div className="flex gap-2 items-center mt-2">
+                  <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-gray-400 border border-glass-border px-2 py-0.75 rounded">
+                    {kind}
+                  </span>
+                  <span className={`font-mono text-[10.5px] ${isLive ? "text-neon-green" : "text-gray-500"}`}>
+                    {isLive ? "● EM PRODUÇÃO" : "● REPOSITÓRIO"}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-        <div className="flex gap-2">
-          {Array.from({ length: maxIndex + 1 }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => snapTo(i)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === current
-                  ? "w-6 bg-neon-green shadow-[0_0_6px_rgba(0,255,102,0.7)]"
-                  : "w-1.5 bg-white/20 hover:bg-white/40"
-              }`}
-            />
-          ))}
-        </div>
+            <p className="text-[13.5px] leading-relaxed text-gray-400 mt-4.5 mb-4 max-w-[64ch]">
+              {active.description}
+            </p>
 
-        <button
-          onClick={() => snapTo(current + 1)}
-          className="w-9 h-9 flex items-center justify-center rounded border border-glass-border text-gray-400 hover:border-white hover:text-white transition-colors"
-        >
-          <ChevronRight size={18} />
-        </button>
+            <div className="flex flex-wrap gap-2 items-center pt-4 border-t border-white/[0.06]">
+              {active.techs.map((tech) => (
+                <span
+                  key={tech}
+                  className="font-mono text-[10.5px] border border-glass-border px-2.5 py-1 rounded text-gray-300"
+                >
+                  {tech}
+                </span>
+              ))}
+              <div className="ml-auto flex gap-4">
+                {active.repo && (
+                  <a
+                    href={active.repo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[11.5px] text-gray-500 no-underline hover:text-gray-300 transition-colors"
+                  >
+                    repo ↗
+                  </a>
+                )}
+                {active.demo && (
+                  <a
+                    href={active.demo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[11.5px] text-accent no-underline hover:underline"
+                  >
+                    acessar ↗
+                  </a>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

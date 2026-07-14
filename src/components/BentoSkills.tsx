@@ -1,54 +1,39 @@
 "use client";
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import { Cloud, Container, Settings, Box, Database, Zap } from "lucide-react";
-import { FaReact, FaPython } from "react-icons/fa";
-import { SiDjango } from "react-icons/si";
+import { motion } from "framer-motion";
 
-const smallSkills = [
-  { name: "React / Next.js", icon: FaReact, color: "text-[#61DAFB]" },
-  { name: "Vite",            icon: Zap,      color: "text-[#646CFF]" },
-  { name: "Supabase",        icon: Database,  color: "text-[#3ECF8E]" },
-  { name: "Node.js",         icon: Settings,  color: "text-[#339933]" },
-  { name: "Python",          icon: FaPython,  color: "text-[#3776AB]" },
-  { name: "Django",          icon: SiDjango,  color: "text-[#44B78B]" },
+const stack = [
+  { name: "React", sub: "/ Next.js", color: "#7aa2f7", detail: "5+ anos", detailSub: "PRODUÇÃO DIÁRIA" },
+  { name: "Python", sub: "/ Django", color: "#9ece6a", detail: "APIs REST", detailSub: "FASTAPI · DJANGO" },
+  { name: "Kubernetes", sub: "/ Docker", color: "#4ec9b0", detail: "Cluster próprio", detailSub: "HELM · PROMETHEUS" },
+  { name: "AWS", sub: "/ Azure", color: "#c586c0", detail: "Infra cloud", detailSub: "PROVISIONAMENTO" },
+  { name: "Supabase", sub: "/ PostgreSQL", color: "#e9c46a", detail: "Auth + RLS", detailSub: "REALTIME DB" },
+  { name: "Node.js", sub: "/ Express", color: "#f2a65a", detail: "Gateways", detailSub: "RATE LIMITING" },
+  { name: "FastAPI", sub: "/ JWT", color: "#ff8a65", detail: "Microsserviços", detailSub: "OPENAPI DOCS" },
+  { name: "Grafana", sub: "/ Prometheus", color: "#7ee787", detail: "Observability", detailSub: "LOKI · DASHBOARDS" },
 ];
 
-// DOM-direct tilt: bypasses framer-motion entirely, zero conflict with variants/stagger
-function TiltCard({ children, className, maxTilt = 8 }: {
-  children: React.ReactNode;
-  className?: string;
-  maxTilt?: number;
-}) {
-  const tiltRef = useRef<HTMLDivElement>(null);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(wrapRef, { once: false, margin: "-60px" });
-
-  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!tiltRef.current) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    tiltRef.current.style.transform = `perspective(800px) rotateX(${(-y * maxTilt * 2).toFixed(2)}deg) rotateY(${(x * maxTilt * 2).toFixed(2)}deg) scale3d(1.02,1.02,1.02)`;
-  };
-
-  const onMouseLeave = () => {
-    if (!tiltRef.current) return;
-    tiltRef.current.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
-  };
-
+function FlipCard({ item }: { item: (typeof stack)[number] }) {
   return (
-    <div ref={wrapRef} className="h-full" onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}>
-      <div
-        ref={tiltRef}
-        style={{
-          transition: "transform 0.18s ease-out, backdrop-filter 1s ease",
-          willChange: "transform",
-          backdropFilter: inView ? "blur(12px)" : "blur(0px)",
-        }}
-        className={className}
-      >
-        {children}
+    <div className="[perspective:1000px] h-28">
+      <div className="group relative w-full h-full [transform-style:preserve-3d] transition-transform duration-[550ms] [transition-timing-function:cubic-bezier(.16,1,.3,1)] cursor-pointer hover:[transform:rotateY(180deg)]">
+        {/* Front */}
+        <div className="absolute inset-0 [backface-visibility:hidden] bg-panel backdrop-blur-[2.5px] saturate-150 border border-glass-border rounded-[10px] flex flex-col items-center justify-center gap-2">
+          <span
+            className="font-display font-bold text-[13px]"
+            style={{ color: item.color }}
+          >
+            {item.name}
+          </span>
+          <span className="font-mono text-[10.5px] text-gray-500">{item.sub}</span>
+        </div>
+        {/* Back */}
+        <div
+          className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-[10px] flex flex-col items-center justify-center gap-1.5 px-2.5"
+          style={{ background: item.color }}
+        >
+          <span className="font-mono font-bold text-xs text-[#0d0d0d] text-center">{item.detail}</span>
+          <span className="font-mono text-[9.5px] text-[#0d0d0d]/60 tracking-[0.06em]">{item.detailSub}</span>
+        </div>
       </div>
     </div>
   );
@@ -57,12 +42,11 @@ function TiltCard({ children, className, maxTilt = 8 }: {
 export function BentoSkills() {
   const container = {
     hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.08 } },
+    show: { opacity: 1, transition: { staggerChildren: 0.06 } },
   };
-
   const item = {
-    hidden: { opacity: 0, y: 25 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } },
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const } },
   };
 
   return (
@@ -71,63 +55,11 @@ export function BentoSkills() {
       initial="hidden"
       whileInView="show"
       viewport={{ once: false, margin: "-60px" }}
-      className="grid grid-cols-2 md:grid-cols-4 auto-rows-[150px] md:auto-rows-[180px] gap-5"
+      className="grid grid-cols-2 md:grid-cols-4 gap-3.5"
     >
-      {/* Cloud Card (Large) */}
-      <motion.div variants={item} className="col-span-2 row-span-2">
-        <TiltCard maxTilt={5} className="h-full rounded-xl p-6 border border-glass-border bg-linear-to-br from-white/5 to-white/2 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Cloud size={120} />
-          </div>
-          <div className="h-full flex flex-col z-10 relative">
-            <div className="flex items-center gap-2 font-sans font-semibold text-white mb-6">
-              <Cloud className="text-neon-cyan" /> Cloud Providers
-            </div>
-            <div className="flex-1 flex items-center justify-center gap-8">
-              <div className="flex flex-col items-center gap-2 transform transition-transform group-hover:scale-110">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-[0_0_15px_rgba(255,153,0,0.2)]">
-                  <Cloud size={32} className="text-[#FF9900]" />
-                </div>
-                <span className="font-mono text-sm text-gray-300">AWS</span>
-              </div>
-              <div className="flex flex-col items-center gap-2 transform transition-transform group-hover:scale-110">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-[0_0_15px_rgba(0,137,214,0.2)]">
-                  <Cloud size={32} className="text-[#0089D6]" />
-                </div>
-                <span className="font-mono text-sm text-gray-300">Azure</span>
-              </div>
-            </div>
-            <div className="mt-auto text-sm text-gray-400">Infraestrutura resiliente e provisionamento escalável.</div>
-          </div>
-        </TiltCard>
-      </motion.div>
-
-      {/* Containers Card (Medium) */}
-      <motion.div variants={item} className="col-span-2 row-span-1">
-        <TiltCard maxTilt={4} className="h-full border border-glass-border bg-panel rounded-xl p-6 flex flex-col group relative overflow-hidden">
-          <div className="flex items-center gap-2 font-sans font-semibold text-white mb-4 relative z-10">
-            <Container className="text-blue-500" /> Containers & DevOps
-          </div>
-          <div className="flex-1 flex items-center justify-around relative z-10">
-            <div className="flex items-center gap-3">
-              <Box className="text-[#2496ED] animate-[float_4s_ease-in-out_infinite]" size={36} />
-              <span className="font-mono text-gray-300">Docker</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Container className="text-[#326CE5] animate-[float_4s_ease-in-out_infinite_2s]" size={36} />
-              <span className="font-mono text-gray-300">K8s</span>
-            </div>
-          </div>
-        </TiltCard>
-      </motion.div>
-
-      {/* Small Cards */}
-      {smallSkills.map((skill, i) => (
-        <motion.div key={i} variants={item} className="col-span-1 row-span-1">
-          <TiltCard maxTilt={12} className="h-full border border-glass-border bg-panel rounded-xl p-4 flex flex-col items-center justify-center gap-3 group cursor-default">
-            <skill.icon size={32} className={`${skill.color} drop-shadow-md transition-transform duration-200 group-hover:scale-110`} />
-            <span className="font-mono text-sm text-gray-300 text-center">{skill.name}</span>
-          </TiltCard>
+      {stack.map((s) => (
+        <motion.div key={s.name} variants={item}>
+          <FlipCard item={s} />
         </motion.div>
       ))}
     </motion.div>

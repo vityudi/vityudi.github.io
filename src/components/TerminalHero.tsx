@@ -1,16 +1,14 @@
 "use client";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Terminal, Server, Rocket, FileCode } from "lucide-react";
 
 export function TerminalHero() {
   const terminalTiltRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
 
   const sectionOpacity = useTransform(scrollY, [0, 480], [1, 0]);
-  const sectionScale   = useTransform(scrollY, [0, 480], [1, 0.93]);
-  const termY          = useTransform(scrollY, [0, 700], [0, 70]);
-  const hudY           = useTransform(scrollY, [0, 700], [0, 35]);
+  const sectionScale = useTransform(scrollY, [0, 480], [1, 0.93]);
+  const termY = useTransform(scrollY, [0, 700], [0, 70]);
 
   const onTerminalMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!terminalTiltRef.current) return;
@@ -18,7 +16,7 @@ export function TerminalHero() {
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
     terminalTiltRef.current.style.transform =
-      `perspective(900px) rotateX(${(-y * 10).toFixed(2)}deg) rotateY(${(x * 10).toFixed(2)}deg)`;
+      `perspective(900px) rotateX(${(-y * 8).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg)`;
   };
 
   const onTerminalMouseLeave = () => {
@@ -28,111 +26,91 @@ export function TerminalHero() {
   };
 
   return (
-    <motion.section
-      style={{ opacity: sectionOpacity, scale: sectionScale }}
-      className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-10"
-    >
+    <motion.section style={{ opacity: sectionOpacity, scale: sectionScale }}>
+      <div className="font-mono text-xs tracking-[0.12em] mb-4">
+        <span className="text-term-keyword">root@vyudi</span>
+        <span className="text-gray-600">:~$</span>{" "}
+        <span className="text-term-func">whoami</span>{" "}
+        <span className="text-term-string">--role</span>
+      </div>
 
-      {/* Terminal — parallax wrapper */}
-      <motion.div style={{ y: termY }} className="lg:col-span-2">
-        {/* perspective context + mouse handlers */}
+      <h1 className="font-display font-black text-5xl md:text-[58px] leading-[0.96] tracking-[-0.015em] m-0">
+        VITOR YUDI.
+      </h1>
+
+      <div className="inline-flex items-center gap-2 mt-3.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-neon-green inline-block" />
+        <span className="font-mono font-semibold text-lg md:text-[22px] tracking-[0.08em] text-accent uppercase">
+          Fullstack &amp; DevOps
+        </span>
+      </div>
+
+      <p className="max-w-[54ch] text-sm leading-relaxed text-gray-400 mt-5 font-mono">
+        Desenvolvedor fullstack e engenheiro DevOps com visão de produto. Projeto, construo e opero
+        sistemas de ponta a ponta — do front-end à infraestrutura cloud — traduzindo requisitos de
+        negócio em software confiável e pronto para escalar.
+      </p>
+
+      {/* Terminal window */}
+      <motion.div style={{ y: termY }} className="mt-8">
         <div
           style={{ perspective: "900px" }}
           onMouseMove={onTerminalMouseMove}
           onMouseLeave={onTerminalMouseLeave}
         >
-          {/* tilt target — pure CSS, no framer-motion conflict */}
           <div
             ref={terminalTiltRef}
             style={{ transition: "transform 0.18s ease-out", willChange: "transform" }}
           >
-            {/* entry animation — only opacity/y/filter, no transform conflict */}
             <motion.div
               initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-xl overflow-hidden border border-glass-border bg-panel/60 backdrop-blur-md shadow-2xl relative"
+              className="rounded-xl overflow-hidden border border-glass-border shadow-2xl"
             >
-              <div className="bg-black/25 px-4 py-3 flex items-center justify-between border-b border-glass-border">
-                <span className="text-xs text-gray-400 font-mono flex items-center gap-2">
-                  <Terminal size={14} className="text-neon-cyan" />
-                  ~/vitoryudi/dashboard.sh --bash
+              <div className="flex items-center gap-2 px-3.5 py-2.5 bg-panel-solid backdrop-blur-[2.5px] saturate-150">
+                <span className="w-3 h-3 rounded-full bg-[#ff5f57] inline-block" />
+                <span className="w-3 h-3 rounded-full bg-[#febc2e] inline-block" />
+                <span className="w-3 h-3 rounded-full bg-[#28c840] inline-block" />
+                <span className="flex-1 text-center mr-16 font-mono text-[11.5px] text-gray-400">
+                  vyudi — ~/ops/status — 80×24
                 </span>
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500 shadow-inner"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-inner"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500 shadow-inner"></div>
-                </div>
               </div>
-
-              <div className="p-6 md:p-8 font-mono text-[15px]">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-neon-green font-bold drop-shadow-[0_0_8px_rgba(0,255,102,0.2)]">root@yudi:~#</span>
-                  <span className="text-term-func">./init.sh</span>
-                  <span className="text-term-string">--user</span>
-                  <span className="text-white">vityudi</span>
-                </div>
-
-                <div className="mb-8 pl-4 border-l-2 border-white/10">
-                  <h1 className="text-4xl md:text-5xl font-sans font-extrabold mb-2 text-white">
-                    Olá, eu sou <span className="text-neon-cyan drop-shadow-[0_0_15px_rgba(0,240,255,0.4)]">Vitor Yudi</span>
-                  </h1>
-                  <h2 className="text-xl md:text-2xl text-foreground font-sans font-medium drop-shadow-md">
-                    Desenvolvedor Fullstack & DevOps
-                  </h2>
-                </div>
-
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-neon-green font-bold">root@yudi:~#</span>
-                  <span className="text-term-keyword">cat</span>
-                  <span className="text-white">profile.md</span>
-                </div>
-
-                <div className="pl-4 border-l-2 border-white/10 text-gray-400 font-sans text-base leading-relaxed">
-                  <span className="text-term-keyword">#</span> Missão<br />
-                  Construir infraestruturas escaláveis e aplicações resilientes.<br />
-                  Unir o desenvolvimento de <b>software robusto</b> com <b>visão de produto</b>,
-                  entregando cadeia <br />end-to-end completa com produtos que fazem sentido.
-                </div>
-
-                <div className="flex items-center gap-2 mt-6 mb-3">
-                  <span className="text-neon-green font-bold">root@yudi:~#</span>
-                  <span className="text-term-keyword">wget</span>
-                  <span className="text-term-string">curriculum.pdf</span>
-                </div>
-
-                <a
-                  href="/cv"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group ml-4 pl-4 border-l-2 border-white/10 flex items-center gap-3 w-fit hover:border-neon-cyan/40 transition-colors"
-                >
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2 text-xs text-gray-500 font-mono">
-                      <span className="text-neon-cyan">Saving:</span>
-                      <span>curriculum.pdf</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-px">
-                        {Array.from({ length: 10 }).map((_, i) => (
-                          <span
-                            key={i}
-                            className="inline-block w-3 h-2 bg-neon-cyan/70 group-hover:bg-neon-cyan transition-colors"
-                            style={{ transitionDelay: `${i * 20}ms` }}
-                          />
-                        ))}
-                      </div>
-                      <span className="font-mono text-xs text-gray-400">100%</span>
-                      <span className="font-mono text-xs text-neon-cyan font-bold group-hover:underline">
-                        open ↗
-                      </span>
-                    </div>
+              <div className="bg-panel backdrop-blur-[2.5px] saturate-150 px-6 py-5">
+                <div className="font-mono text-[13.5px] leading-[1.75]">
+                  <div>
+                    <span className="text-term-keyword">$</span>{" "}
+                    <span className="text-term-func">nmap</span>{" "}
+                    <span className="text-term-string">-sV skills</span>{" "}
+                    <span className="text-gray-300">--scan-all</span>
                   </div>
-                </a>
-
-                <div className="flex items-center gap-2 mt-4">
-                  <span className="text-neon-green font-bold">root@yudi:~#</span>
-                  <span className="w-2.5 h-[1.2em] bg-neon-cyan inline-block animate-pulse"></span>
+                  <div className="text-gray-600">Starting scan @ vyudi.dev ...</div>
+                  <div>
+                    <span className="text-term-string">[+] react/next.js</span>{" "}
+                    <span className="text-gray-700">.........</span>{" "}
+                    <span className="text-neon-green">OPEN</span>
+                  </div>
+                  <div>
+                    <span className="text-term-string">[+] python/django</span>{" "}
+                    <span className="text-gray-700">.........</span>{" "}
+                    <span className="text-neon-green">OPEN</span>
+                  </div>
+                  <div>
+                    <span className="text-term-string">[+] kubernetes/docker</span>{" "}
+                    <span className="text-gray-700">.....</span>{" "}
+                    <span className="text-neon-green">OPEN</span>
+                  </div>
+                  <div>
+                    <span className="text-term-string">[+] aws/azure</span>{" "}
+                    <span className="text-gray-700">.............</span>{" "}
+                    <span className="text-neon-green">OPEN</span>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-term-keyword">$</span>{" "}
+                    <span className="text-term-func">./deploy</span>{" "}
+                    <span className="text-gray-300">--env=production</span>
+                    <span className="inline-block w-1.75 h-3.75 bg-foreground ml-1.5 align-[-2px] animate-pulse" />
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -140,35 +118,22 @@ export function TerminalHero() {
         </div>
       </motion.div>
 
-      {/* Side HUD — shallower parallax layer */}
-      <motion.div style={{ y: hudY }}>
-        <motion.div
-          initial={{ opacity: 0, x: 45, filter: "blur(10px)" }}
-          animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-          transition={{ duration: 1.0, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col gap-6"
+      <div className="flex flex-wrap gap-3 mt-6">
+        <a
+          href="#deploy"
+          className="font-display font-extrabold text-xs bg-accent text-[#0d0d0d] px-5.5 py-3 tracking-[0.02em] no-underline"
         >
-          <div className="p-6 rounded-xl border border-glass-border bg-panel backdrop-blur-md shadow-lg flex items-center gap-4 group hover:border-neon-green/30 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-neon-green/10 text-neon-green flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Server size={24} />
-            </div>
-            <div>
-              <div className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-1">System Status</div>
-              <div className="text-xl font-mono font-bold text-neon-green">Online</div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <a href="#deploy" className="flex items-center justify-center gap-2 bg-neon-green/10 text-neon-green border border-neon-green/50 py-3 px-6 rounded-lg font-bold uppercase tracking-wider hover:bg-neon-green hover:text-black transition-all shadow-[0_0_15px_rgba(0,255,102,0)] hover:shadow-[0_0_20px_rgba(0,255,102,0.4)]">
-              Deploy Projetos <Rocket size={18} />
-            </a>
-            <a href="#logs" className="flex items-center justify-center gap-2 bg-transparent text-gray-300 border border-glass-border py-3 px-6 rounded-lg font-bold uppercase tracking-wider hover:border-white hover:text-white transition-all">
-              Ver Logs_ <FileCode size={18} />
-            </a>
-          </div>
-        </motion.div>
-      </motion.div>
-
+          VER PROJETOS →
+        </a>
+        <a
+          href="/cv"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-xs text-gray-300 border border-glass-border px-5.5 py-3 no-underline hover:border-white hover:text-white transition-colors"
+        >
+          baixar cv ↓
+        </a>
+      </div>
     </motion.section>
   );
 }
