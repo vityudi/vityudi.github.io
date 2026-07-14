@@ -6,9 +6,10 @@ interface ScrollRevealProps {
   delay?: number;
   direction?: "up" | "down" | "left" | "right" | "none";
   className?: string;
+  once?: boolean;
 }
 
-export function ScrollReveal({ children, delay = 0, direction = "up", className = "" }: ScrollRevealProps) {
+export function ScrollReveal({ children, delay = 0, direction = "up", className = "", once = false }: ScrollRevealProps) {
   const getInitial = () => {
     const base = { opacity: 0, scale: 0.96 };
     switch (direction) {
@@ -25,7 +26,7 @@ export function ScrollReveal({ children, delay = 0, direction = "up", className 
     <motion.div
       initial={getInitial()}
       whileInView={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-      viewport={{ once: false, margin: "-80px" }}
+      viewport={{ once, margin: "-80px" }}
       transition={{
         y:       { type: "spring", stiffness: 70, damping: 20, delay },
         x:       { type: "spring", stiffness: 70, damping: 20, delay },

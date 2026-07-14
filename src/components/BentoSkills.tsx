@@ -1,4 +1,5 @@
 "use client";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 const stack = [
@@ -13,9 +14,34 @@ const stack = [
 ];
 
 function FlipCard({ item }: { item: (typeof stack)[number] }) {
+  const [flipped, setFlipped] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearPending = () => {
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
+
+  const handleEnter = () => {
+    clearPending();
+    timeoutRef.current = setTimeout(() => setFlipped(true), 90);
+  };
+
+  const handleLeave = () => {
+    clearPending();
+    setFlipped(false);
+  };
+
   return (
-    <div className="[perspective:1000px] h-28">
-      <div className="group relative w-full h-full [transform-style:preserve-3d] transition-transform duration-[550ms] [transition-timing-function:cubic-bezier(.16,1,.3,1)] cursor-pointer hover:[transform:rotateY(180deg)]">
+    <div className="[perspective:1200px] h-28">
+      <div
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+        className="relative w-full h-full [transform-style:preserve-3d] transition-transform duration-[420ms] ease-out cursor-pointer"
+        style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
+      >
         {/* Front */}
         <div className="absolute inset-0 [backface-visibility:hidden] bg-panel backdrop-blur-[2.5px] saturate-150 border border-glass-border rounded-[10px] flex flex-col items-center justify-center gap-2">
           <span
@@ -54,7 +80,7 @@ export function BentoSkills() {
       variants={container}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: false, margin: "-60px" }}
+      viewport={{ once: true, margin: "-60px" }}
       className="grid grid-cols-2 md:grid-cols-4 gap-3.5"
     >
       {stack.map((s) => (

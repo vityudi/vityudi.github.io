@@ -22,7 +22,7 @@ export default function Home() {
       <TerminalHero />
 
       {/* 2. Skills Module */}
-      <ScrollReveal direction="up" delay={0.2}>
+      <ScrollReveal direction="up" delay={0.2} once>
         <section id="stack" className="scroll-mt-24">
           <CommandLabel>./stack</CommandLabel>
           <BentoSkills />
