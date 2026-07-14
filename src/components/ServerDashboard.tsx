@@ -13,11 +13,103 @@ function guessKind(proj: Project): string {
   return "Produto";
 }
 
+const KIND_ACCENT: Record<string, string> = {
+  Infraestrutura: "#c586c0",
+  API: "#7aa2f7",
+  Produto: "#4ec9b0",
+};
+
+function hostLabel(proj: Project): string {
+  if (proj.demo) {
+    try {
+      return new URL(proj.demo).hostname.replace(/^www\./, "");
+    } catch {
+      /* fall through */
+    }
+  }
+  if (proj.repo) {
+    try {
+      const u = new URL(proj.repo);
+      return `${u.hostname}${u.pathname}`.replace(/\/$/, "");
+    } catch {
+      /* fall through */
+    }
+  }
+  return `local://${proj.node_id}`;
+}
+
 function tabStyle(active: boolean) {
   return [
     "font-mono text-[11.5px] px-4 py-2.5 rounded-t-lg whitespace-nowrap cursor-pointer transition-colors",
     active ? "bg-panel text-foreground font-semibold" : "bg-transparent text-gray-500 font-medium hover:text-gray-300",
   ].join(" ");
+}
+
+function ProjectPreview({ proj, kind, index, total }: { proj: Project; kind: string; index: number; total: number }) {
+  const accent = KIND_ACCENT[kind] ?? "#7aa2f7";
+
+  return (
+    <div
+      className="relative h-[220px] md:h-[260px] rounded-lg overflow-hidden border border-white/[0.06]"
+      style={{
+        background: `radial-gradient(120% 140% at 15% 0%, ${accent}26 0%, transparent 55%), linear-gradient(180deg, #17171a 0%, #101012 100%)`,
+      }}
+    >
+      {/* dot grid texture */}
+      <div
+        className="absolute inset-0 opacity-[0.35]"
+        style={{
+          backgroundImage: `radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px)`,
+          backgroundSize: "16px 16px",
+        }}
+      />
+      {/* ambient glow */}
+      <div
+        className="absolute -top-10 -right-10 w-48 h-48 rounded-full blur-3xl opacity-30"
+        style={{ background: accent }}
+      />
+
+      <div className="relative h-full flex flex-col p-4 md:p-5">
+        {/* faux browser bar */}
+        <div className="flex items-center gap-2 mb-4 md:mb-5">
+          <div className="flex gap-1.5 shrink-0">
+            <span className="w-2 h-2 rounded-full bg-white/15 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-white/15 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-white/15 inline-block" />
+          </div>
+          <div className="flex-1 min-w-0 font-mono text-[10px] text-gray-500 bg-black/30 border border-white/[0.06] rounded px-2.5 py-1 truncate">
+            {hostLabel(proj)}
+          </div>
+          <span className="font-mono text-[10px] text-gray-600 shrink-0">
+            {String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
+          </span>
+        </div>
+
+        {/* abstract UI mockup */}
+        <div className="flex-1 grid grid-cols-3 gap-2.5 md:gap-3">
+          <div className="col-span-2 flex flex-col gap-2.5 md:gap-3">
+            <div
+              className="flex-1 rounded-md border border-white/[0.06]"
+              style={{ background: `linear-gradient(135deg, ${accent}1f, transparent)` }}
+            />
+            <div className="h-[30%] rounded-md bg-white/[0.03] border border-white/[0.06] flex items-end gap-1 px-2.5 pb-2">
+              {[40, 65, 35, 80, 55, 70, 45].map((h, i) => (
+                <span
+                  key={i}
+                  className="flex-1 rounded-sm"
+                  style={{ height: `${h}%`, background: `${accent}66` }}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2.5 md:gap-3">
+            <div className="flex-1 rounded-md bg-white/[0.03] border border-white/[0.06]" />
+            <div className="flex-1 rounded-md bg-white/[0.03] border border-white/[0.06]" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function ServerDashboard() {
@@ -73,7 +165,14 @@ export function ServerDashboard() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="flex justify-between items-start mb-1.5">
+            <ProjectPreview
+              proj={active}
+              kind={kind}
+              index={Math.min(activeIdx, projects.length - 1)}
+              total={projects.length}
+            />
+
+            <div className="flex justify-between items-start mt-6 mb-1.5">
               <div>
                 <span className="font-display font-bold text-xl md:text-[23px]">
                   {active.title}

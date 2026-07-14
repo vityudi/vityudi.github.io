@@ -23,7 +23,7 @@ export default function Home() {
 
       {/* 2. Skills Module */}
       <ScrollReveal direction="up" delay={0.2} once>
-        <section id="stack" className="scroll-mt-24">
+        <section id="stack" className="scroll-mt-16">
           <CommandLabel>./stack</CommandLabel>
           <BentoSkills />
         </section>
@@ -31,7 +31,7 @@ export default function Home() {
 
       {/* 3. Projects Module */}
       <ScrollReveal direction="up" delay={0.2}>
-        <section id="deploy" className="scroll-mt-24">
+        <section id="deploy" className="scroll-mt-16">
           <CommandLabel>./projetos_em_destaque</CommandLabel>
           <ServerDashboard />
         </section>
@@ -39,7 +39,7 @@ export default function Home() {
 
       {/* 4. Fullstack Supabase Integration */}
       <ScrollReveal direction="up" delay={0.2}>
-        <section id="logs" className="scroll-mt-24">
+        <section id="logs" className="scroll-mt-16">
           <div className="font-mono text-[11px] tracking-[0.14em] mb-3.5">
             <span className="text-term-keyword">$</span>{" "}
             <span className="text-term-func">tail</span>{" "}
