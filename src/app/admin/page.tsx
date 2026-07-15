@@ -4,8 +4,9 @@ import { Reorder, useDragControls } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import type { Project, GuestbookEntry, CvVersion, CvAccessToken } from "@/lib/types";
 import type { Session } from "@supabase/supabase-js";
-import { LogOut, Plus, Trash2, Edit2, X, Check, ExternalLink, GitBranch, GripVertical, Save, Star, Eye, EyeOff } from "lucide-react";
+import { LogOut, Plus, Trash2, Edit2, X, Check, ExternalLink, GitBranch, GripVertical, Save, Star, Eye, EyeOff, Wand2, ChevronDown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { autoFormatCv } from "@/lib/formatCv";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -250,6 +251,7 @@ function CvTab() {
   const [previewId, setPreviewId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: "", content: "" });
+  const [formatMenuOpen, setFormatMenuOpen] = useState(false);
 
   const load = useCallback(async () => {
     const { data } = await supabase.from("cv_versions").select("*").order("created_at", { ascending: false });
@@ -278,6 +280,13 @@ function CvTab() {
     setShowAdd(false);
     setEditId(null);
     setForm({ name: "", content: "" });
+  };
+
+  const applyAutoFormat = () => {
+    setFormatMenuOpen(false);
+    if (!form.content.trim()) return;
+    if (!confirm("Auto formatar vai reescrever o conteúdo em markdown. Continuar?")) return;
+    setForm((f) => ({ ...f, content: autoFormatCv(f.content) }));
   };
 
   const saveVersion = async () => {
@@ -337,7 +346,32 @@ function CvTab() {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="font-mono text-[10px] text-gray-400">content (markdown)</label>
+            <div className="flex items-center justify-between">
+              <label className="font-mono text-[10px] text-gray-400">content (markdown)</label>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setFormatMenuOpen((o) => !o)}
+                  className="flex items-center gap-1 font-mono text-[10px] text-gray-400 border border-glass-border px-2 py-1 rounded hover:text-neon-cyan hover:border-neon-cyan/50 transition-colors"
+                >
+                  <Wand2 size={11} /> formatar <ChevronDown size={11} />
+                </button>
+                {formatMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setFormatMenuOpen(false)} />
+                    <div className="absolute right-0 top-full mt-1 z-20 w-40 border border-neon-cyan/40 bg-black rounded-lg shadow-lg overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={applyAutoFormat}
+                        className="w-full flex items-center gap-1.5 font-mono text-[10px] text-gray-300 px-3 py-2 hover:bg-neon-cyan/10 hover:text-neon-cyan transition-colors text-left"
+                      >
+                        <Wand2 size={11} /> auto formatar
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
             <textarea
               value={form.content}
               onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
