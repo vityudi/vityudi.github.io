@@ -1,8 +1,34 @@
 @import "tailwindcss";
 
-:root {
+:root,
+:root.dark {
   --background: #0d0d0d;
   --foreground: #f2f0ea;
+  --panel: rgba(46, 46, 50, 0.26);
+  --panel-solid: rgba(56, 56, 62, 0.32);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --grid-line: rgba(255, 255, 255, 0.06);
+
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+}
+
+:root.light {
+  --background: #f2f0ea;
+  --foreground: #14140f;
+  --panel: rgba(255, 255, 255, 0.55);
+  --panel-solid: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --grid-line: rgba(0, 0, 0, 0.08);
+
+  --gray-300: #27272a;
+  --gray-400: #3f3f46;
+  --gray-500: #52525b;
+  --gray-600: #71717a;
+  --gray-700: #94949c;
 }
 
 @theme inline {
@@ -12,13 +38,19 @@
   --color-neon-cyan: #7aa2f7;
   --color-neon-green: #4ec9b0;
   --color-neon-purple: #c586c0;
-  --color-glass-border: rgba(255, 255, 255, 0.1);
-  --color-panel: rgba(46, 46, 50, 0.26);
-  --color-panel-solid: rgba(56, 56, 62, 0.32);
+  --color-glass-border: var(--glass-border);
+  --color-panel: var(--panel);
+  --color-panel-solid: var(--panel-solid);
 
   --color-term-keyword: #c586c0;
   --color-term-string: #9ece6a;
   --color-term-func: #7aa2f7;
+
+  --color-gray-300: var(--gray-300);
+  --color-gray-400: var(--gray-400);
+  --color-gray-500: var(--gray-500);
+  --color-gray-600: var(--gray-600);
+  --color-gray-700: var(--gray-700);
 
   --font-display: var(--font-unbounded);
   --font-sans: var(--font-manrope);

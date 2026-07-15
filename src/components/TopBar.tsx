@@ -1,3 +1,5 @@
+import { ThemeToggle } from "@/components/ThemeToggle";
+
 export function TopBar() {
   return (
     <div className="print:hidden sticky top-0 z-40 flex items-center justify-between px-4 sm:px-8 py-2.5 bg-panel-solid backdrop-blur-[2.5px] saturate-150 border-b border-glass-border">
@@ -16,8 +18,11 @@ export function TopBar() {
         <a href="#logs" className="no-underline hover:text-accent transition-colors">Logs</a>
       </div>
 
-      <div className="font-mono text-[11px] text-gray-500 hidden sm:block">
-        UPTIME: 1847D
+      <div className="flex items-center gap-4">
+        <span className="font-mono text-[11px] text-gray-500 hidden sm:block">
+          UPTIME: 1847D
+        </span>
+        <ThemeToggle />
       </div>
     </div>
   );

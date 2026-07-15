@@ -35,7 +35,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme");var d=document.documentElement;if(t==="light"){d.classList.remove("dark");d.classList.add("light");}else{d.classList.remove("light");d.classList.add("dark");}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className={`${unbounded.variable} ${manrope.variable} ${jetbrainsMono.variable} antialiased min-h-screen text-foreground font-sans relative pb-7`}>
         <MouseGridBackground />
         <ScrollProgress />
