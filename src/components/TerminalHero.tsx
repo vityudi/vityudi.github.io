@@ -1,10 +1,24 @@
 "use client";
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+
+const CYCLE_WORDS = ["Projeto", "Construo", "Opero", "Entrego", "Escalo", "Planejo", "Monitoro"];
+const CYCLE_COLORS = ["#c586c0", "#7aa2f7", "#9ece6a", "#4ec9b0", "#0a84ff"];
 
 export function TerminalHero() {
   const terminalTiltRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
+  const [cycleIndex, setCycleIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCycleIndex((i) => i + 1);
+    }, 1100);
+    return () => clearInterval(id);
+  }, []);
+
+  const activeWord = CYCLE_WORDS[cycleIndex % CYCLE_WORDS.length];
+  const activeColor = CYCLE_COLORS[cycleIndex % CYCLE_COLORS.length];
 
   const sectionOpacity = useTransform(scrollY, [0, 480], [1, 0]);
   const sectionScale = useTransform(scrollY, [0, 480], [1, 0.93]);
@@ -44,8 +58,25 @@ export function TerminalHero() {
         </span>
       </div>
 
-      <p className="max-w-[72ch] text-sm leading-relaxed text-gray-400 mt-5 font-mono">
-        Desenvolvedor fullstack e engenheiro DevOps com visão de produto. Projeto, construo e opero
+      <p className="max-w-[55ch] text-sm leading-relaxed text-gray-400 mt-5 font-mono">
+        Desenvolvedor fullstack e DevOps com visão de produto.{" "}
+        <AnimatePresence mode="popLayout">
+          <motion.span
+            key={cycleIndex}
+            layout
+            initial={{ opacity: 0, y: 6, scale: 0.9, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -6, scale: 0.9, filter: "blur(4px)" }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              color: activeColor,
+              textShadow: `0 0 16px ${activeColor}55`,
+            }}
+            className="font-bold inline-block text-left tracking-wide origin-left text-base md:text-[17px]"
+          >
+            {activeWord}
+          </motion.span>
+        </AnimatePresence>{" "}
         sistemas de ponta a ponta, traduzindo requisitos de negócio em software confiável e pronto para escalar.
       </p>
 
